@@ -1,0 +1,56 @@
+# Full-stack face detection system.
+# One command: docker compose up --build
+#
+# Services:
+#   frontend  → React (nginx)      → :3000
+#   backend   → FastAPI (uvicorn)   → :8000
+#   db        → PostgreSQL 16       → :5433 (host) / :5432 (internal)
+#
+# Data flow:
+#   Browser → nginx:3000 → /api/* proxied → backend:8000 → db:5432
+
+services:
+  # --- React Frontend (nginx) ---
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # --- FastAPI Backend ---
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/facedetect
+      - DATABASE_URL_SYNC=postgresql+psycopg2://postgres:postgres@db:5432/facedetect
+      - DETECTION_CONFIDENCE=0.5
+      - DEBUG=false
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- PostgreSQL Database ---
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: facedetect
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:

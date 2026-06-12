@@ -1,0 +1,200 @@
+/* ── VideoStreamer Component ── */
+
+.streamer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.streamer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.streamer-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.streamer-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── Status indicator ── */
+
+.streamer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.streamer-status.streaming {
+  background: var(--green-glow);
+  color: var(--green);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.streamer-status.connecting,
+.streamer-status.reconnecting {
+  background: rgba(234, 179, 8, 0.12);
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.2);
+}
+
+.streamer-status.error {
+  background: var(--red-glow);
+  color: var(--red);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.streamer-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Toggle button ── */
+
+.streamer-btn {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.streamer-btn.start {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.streamer-btn.start:hover:not(:disabled) {
+  background: #818cf8;
+  border-color: #818cf8;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
+}
+
+.streamer-btn.stop {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--red);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.streamer-btn.stop:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+}
+
+.streamer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Viewport ── */
+
+.streamer-viewport {
+  position: relative;
+  background: #000;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.streamer-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.streamer-video.visible {
+  opacity: 1;
+}
+
+/* ── Overlay states ── */
+
+.streamer-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.streamer-overlay.error {
+  color: var(--red);
+}
+
+.streamer-overlay-icon {
+  font-size: 2.2rem;
+  margin-bottom: 4px;
+}
+
+/* ── Spinner ── */
+
+.streamer-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .streamer-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .streamer-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
