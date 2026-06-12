@@ -13,14 +13,35 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+import urllib.parse
+
+db_url = settings.DATABASE_URL
+connect_args = {}
+
+# asyncpg does not support the sslmode query parameter and will raise a TypeError.
+# We strip it from the URL and pass it via connect_args.
+if "asyncpg" in db_url:
+    parsed = urllib.parse.urlparse(db_url)
+    query = urllib.parse.parse_qs(parsed.query)
+    if "sslmode" in query:
+        sslmode = query["sslmode"][0]
+        query.pop("sslmode", None)
+        new_query = urllib.parse.urlencode(query, doseq=True)
+        db_url = urllib.parse.urlunparse(
+            (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
+        )
+        if sslmode in ("require", "verify-ca", "verify-full", "prefer"):
+            connect_args["ssl"] = "require"
+        elif sslmode == "disable":
+            connect_args["ssl"] = False
+
 # Create the async engine
-# pool_size=5: Default connection pool. Enough for moderate load.
-# echo=False: Set to True during debugging to see generated SQL.
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    db_url,
     echo=settings.DEBUG,
     pool_size=5,
     max_overflow=10,
+    connect_args=connect_args,
 )
 
 # Session factory — creates new sessions, does NOT open a connection yet
